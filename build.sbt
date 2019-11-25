@@ -13,7 +13,7 @@ libraryDependencies += "org.apache.spark" %% "spark-core" % "2.4.3"
 libraryDependencies += "org.apache.spark" %% "spark-sql" % "2.4.3"
 
 // https://mvnrepository.com/artifact/org.apache.spark/spark-streaming
-libraryDependencies += "org.apache.spark" %% "spark-streaming" % "2.4.3" % "provided"
+libraryDependencies += "org.apache.spark" %% "spark-streaming" % "2.4.3"
 
 assemblyMergeStrategy in assembly := {
   case PathList("META-INF", xs @ _*) => MergeStrategy.discard

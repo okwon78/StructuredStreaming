@@ -1,7 +1,7 @@
 import org.apache.spark.sql.SparkSession
 
 
-object StructuredNetworkWordCountApp {
+object StructuredNetworkWordCount {
   def main(args: Array[String]): Unit = {
 
     val spark = SparkSession
