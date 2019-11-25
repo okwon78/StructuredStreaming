@@ -1,5 +1,6 @@
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types._
+import org.apache.spark.sql.functions._
 
 object ThumblingWindow {
   def main(args: Array[String]): Unit = {
@@ -25,8 +26,20 @@ object ThumblingWindow {
       .option("maxFilesPerTrigger", 2)
       .csv("/Users/amore/Dev/Spark/TalentOrigin/datasets/retail-data")
 
-//    val tumblingWindowAggregations = streamingData
-//      .groupBy("Country")
-//      .
+    val tumblingWindowAggregations = streamingData
+      .groupBy(
+        window(col("InvoiceTimestamp"),"1 hours"),
+        col("Country")
+      )
+      .agg(sum("UnitPrice"))
+
+    val sink = tumblingWindowAggregations
+      .writeStream
+      .format("console")
+      .option("truncate", "false")
+      .outputMode("complete")
+      .start()
+
+    sink.awaitTermination()
   }
 }
