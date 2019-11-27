@@ -4,33 +4,28 @@ import org.apache.spark.sql.types._
 
 object StructuredStreamingETL {
   def main(args: Array[String]): Unit = {
-    val spark = SparkSession.builder().appName("Spark Structured Streaming").master("local[3]").getOrCreate()
+    val spark = SparkSession.builder().appName("Structured Streaming ETL").master("local[3]").getOrCreate()
 
     spark.sparkContext.setLogLevel("ERROR")
 
-    //InvoiceNo,StockCode,Description,Quantity,InvoiceDate,UnitPrice,CustomerID,Country,InvoiceTimestamp
-    val retailDataSchema = new StructType()
-      .add("Idx", IntegerType)
-      .add("InvoiceNo", StringType)
-      .add("StockCode", StringType)
-      .add("Description", StringType)
-      .add("Quantity", IntegerType)
-      .add("InvoiceDate", TimestampType)
-      .add("UnitPrice", DoubleType)
-      .add("CustomerId", IntegerType)
+    val schema = new StructType()
+      .add("Count", IntegerType)
       .add("Country", StringType)
-      .add("InvoiceTimestamp", TimestampType)
+      .add("timestamp", TimestampType)
 
     val streamingData = spark
       .readStream
-      .schema(retailDataSchema)
+      .schema(schema)
+      .option("maxFilesPerTrigger", 1)
       .option("header", true)
-      .csv("/Users/amore/Dev/Spark/TalentOrigin/datasets/tmp")
+      .csv("./data/source")
 
-    val filteredData = streamingData.filter("Country = 'United Kingdom'")
+    val filteredData = streamingData
+      .where("Country = 'United Kingdom'")
 
     val query = filteredData.writeStream
       .format("console")
+      .option("truncate", "false")
       .queryName("filteredByCountry")
       .outputMode(OutputMode.Append())
       .start()

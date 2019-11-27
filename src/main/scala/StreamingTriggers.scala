@@ -8,40 +8,32 @@ object StreamingTriggers {
     val spark = SparkSession.builder().appName("Spark Structured Streaming").master("local[4]").getOrCreate()
     spark.sparkContext.setLogLevel("ERROR")
 
-    val retailDataSchema = new StructType()
-      .add("Idx", IntegerType)
-      .add("InvoiceNo", StringType)
-      .add("StockCode", StringType)
-      .add("Description", StringType)
-      .add("Quantity", IntegerType)
-      .add("InvoiceDate", TimestampType)
-      .add("UnitPrice", DoubleType)
-      .add("CustomerId", StringType)
+    val schema = new StructType()
+      .add("Count", IntegerType)
       .add("Country", StringType)
-      .add("InvoiceTimestamp", TimestampType)
+      .add("timestamp", TimestampType)
 
     val streamingData = spark
       .readStream
-      .schema(retailDataSchema)
-      .option("header", true)
+      .schema(schema)
       .option("maxFilesPerTrigger", 1)
-      .csv("/Users/amore/Dev/Spark/TalentOrigin/datasets/retail-data")
+      .option("header", true)
+      .csv("./data/source")
 
     val tumblingWindowAggregations = streamingData
-      .where("Country = 'United Kingdom'")
       .groupBy(
-        window(col("InvoiceTimestamp"),"1 hours", "15 minutes"),
+        window(col("timestamp"),"1 hours", "15 minutes"),
         col("Country")
       )
-      .agg(sum("UnitPrice"))
+      .agg(sum("Count"))
 
     val sink = tumblingWindowAggregations
       .writeStream
-      .trigger(Trigger.Once())
-      //.trigger(Trigger.ProcessingTime("20 seconds"))
+      //.trigger(Trigger.Once())
+      .trigger(Trigger.ProcessingTime("10 seconds"))
       .format("console")
       .option("truncate", "false")
-      .outputMode("complete")
+      .outputMode("update")
       .start()
 
     sink.awaitTermination()

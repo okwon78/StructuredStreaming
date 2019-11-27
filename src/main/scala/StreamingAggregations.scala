@@ -5,35 +5,28 @@ import org.apache.spark.sql.streaming.OutputMode
 
 object StreamingAggregations {
   def main(args: Array[String]): Unit = {
-    val spark = SparkSession.builder().appName("Spark Structured Streaming").master("local[3]").getOrCreate()
+    val spark = SparkSession.builder().appName("Spark Streaming Aggregations").master("local[3]").getOrCreate()
     spark.sparkContext.setLogLevel("ERROR")
 
-    val retailDataSchema = new StructType()
-      .add("Idx", IntegerType)
-      .add("InvoiceNo", StringType)
-      .add("StockCode", StringType)
-      .add("Description", StringType)
-      .add("Quantity", IntegerType)
-      .add("InvoiceDate", TimestampType)
-      .add("UnitPrice", DoubleType)
-      .add("CustomerId", StringType)
+    val schema = new StructType()
+      .add("Count", IntegerType)
       .add("Country", StringType)
-      .add("InvoiceTimestamp", TimestampType)
+      .add("timestamp", TimestampType)
 
     val streamingData = spark
       .readStream
-      .schema(retailDataSchema)
+      .schema(schema)
       .option("header", true)
-      .option("maxFilesPerTrigger", 2)
-      .csv("/Users/amore/Dev/Spark/TalentOrigin/datasets/retail-data")
+      .option("maxFilesPerTrigger", 1)
+      .csv("./data/source")
 
     val aggregateData = streamingData
-      .where("Quantity > 10")
-      .groupBy("InvoiceDate", "Country")
-      .agg(sum("UnitPrice"))
+      .groupBy("Country")
+      .agg(sum("Count"))
 
     val query = aggregateData.writeStream
       .format("console")
+      .option("truncate", "false")
       .queryName("aggregationTest")
       .outputMode(OutputMode.Complete())
       .start()
