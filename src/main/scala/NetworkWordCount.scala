@@ -1,12 +1,12 @@
 import org.apache.spark.sql.SparkSession
 
 
-object StructuredNetworkWordCount {
+object NetworkWordCount {
   def main(args: Array[String]): Unit = {
 
     val spark = SparkSession
       .builder
-      .appName("StructuredNetworkWordCount")
+      .appName("NetworkWordCount")
       .getOrCreate()
 
     spark.sparkContext.setLogLevel("WARN")
