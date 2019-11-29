@@ -9,6 +9,8 @@ object NetworkWordCount {
       .appName("NetworkWordCount")
       .getOrCreate()
 
+    spark.conf.set("spark.sql.shuffle.partitions", 2)
+    spark.conf.set("spark.default.parallelism", 2)
     spark.sparkContext.setLogLevel("WARN")
 
     import spark.implicits._

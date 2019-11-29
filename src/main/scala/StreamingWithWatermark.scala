@@ -8,6 +8,8 @@ object StreamingWithWatermark {
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder().appName("StreamingWithWatermark").master("local[3]").getOrCreate()
 
+    spark.conf.set("spark.sql.shuffle.partitions", 2)
+    spark.conf.set("spark.default.parallelism", 2)
     spark.sparkContext.setLogLevel("ERROR")
 
     val schema = new StructType()

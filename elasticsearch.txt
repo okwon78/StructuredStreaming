@@ -1,0 +1,44 @@
+PUT /index_test
+{
+  "settings": {
+    "number_of_shards": 3,
+    "number_of_replicas": 0
+  },
+  "mappings": {
+    "properties": {
+      "Count": { "type": "integer"},
+      "Country": { "type": "text" },
+      "Timestamp": {
+          "type": "date",
+          "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"
+      }
+    }
+  }
+}
+
+GET /index_test
+
+DELETE /index_test
+
+PUT index_test/_doc/1
+{
+    "Count": 1,
+    "Country": "Korea",
+    "Timestamp": "2011-01-10 11:25:00"
+}
+
+PUT index_test/_doc/2
+{
+    "Count": 10,
+    "Country": "United States",
+    "Timestamp": "2011-01-10 10:25:00"
+}
+
+GET index_test/_search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+GET /_cat/indices?v

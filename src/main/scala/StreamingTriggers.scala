@@ -1,11 +1,21 @@
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions.{col, sum, window}
-import org.apache.spark.sql.streaming.Trigger
-import org.apache.spark.sql.types.{DoubleType, IntegerType, StringType, StructType, TimestampType}
+import org.apache.spark.sql.types._
 
 object StreamingTriggers {
   def main(args: Array[String]): Unit = {
-    val spark = SparkSession.builder().appName("Spark Structured Streaming").master("local[4]").getOrCreate()
+    val spark = SparkSession.builder()
+      .appName("Spark Structured Streaming")
+      .config("es.nodes", "localhost")
+      .config("es.port", "9200")
+      //.config("es.index.auto.create", "true")
+      .config("es.nodes.wan.only", "true")
+      .config("es.net.http.auth.user", "elastic")
+      .config("es.net.http.auth.pass", "changeme")
+      .master("local[4]").getOrCreate()
+
+    spark.conf.set("spark.sql.shuffle.partitions", 2)
+    spark.conf.set("spark.default.parallelism", 2)
+
     spark.sparkContext.setLogLevel("ERROR")
 
     val schema = new StructType()
@@ -20,22 +30,13 @@ object StreamingTriggers {
       .option("header", true)
       .csv("./data/source")
 
-    val tumblingWindowAggregations = streamingData
-      .groupBy(
-        window(col("timestamp"),"1 hours", "15 minutes"),
-        col("Country")
-      )
-      .agg(sum("Count"))
-
-    val sink = tumblingWindowAggregations
+    val sink = streamingData
       .writeStream
-      //.trigger(Trigger.Once())
-      .trigger(Trigger.ProcessingTime("10 seconds"))
-      .format("console")
-      .option("truncate", "false")
-      .outputMode("update")
-      .start()
-
-    sink.awaitTermination()
+      .outputMode("append")
+      .format("org.elasticsearch.spark.sql")
+      .option("es.resource", "index_test/doc")
+      .option("es.nodes", "localhost")
+      .option("checkpointLocation", "./checkpoint")
+      .start().awaitTermination()
   }
 }
