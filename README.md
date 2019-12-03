@@ -1,18 +1,18 @@
 # Structured Streaming Quick Example
 
-## Structured Streaming ETL
+## 1. Structured Streaming ETL
 
-## Thumbling Window
+## 2. Thumbling Window
 
-## Streaming Triggers
+## 3. Streaming Triggers
 
-## Streaming Aggregations
+## 4. Streaming Aggregations
 
-## Sliding Window
+## 5. Sliding Window
 
-## Elasticsearch Sink
+## 6. Elasticsearch Sink
 
-## NetworkWordCount
+## 7. NetworkWordCount
 Let’s say you want to maintain a running word count of text data received from a data server listening on a TCP socket. Let’s see how you can express this using Structured Streaming.
 
 
