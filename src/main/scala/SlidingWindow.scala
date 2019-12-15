@@ -24,10 +24,11 @@ object SlidingWindow {
 
     val slidingWindowAggregations = streamingData
       .groupBy(
-        window(col("timestamp"),"1 hours", "10 minutes"),
+        window(col("timestamp"),"1 hours", "30 minutes"),
         col("Country")
       )
       .agg(sum("Count"))
+      .orderBy("window")
 
     val sink = slidingWindowAggregations
       .writeStream
