@@ -2,13 +2,13 @@
 
 ## 1. [Structured Streaming ETL](https://github.com/okwon78/StructuredStreaming/blob/master/src/main/scala/StructuredStreamingETL.scala)
 
-## 2. [Thumbling Window](https://github.com/okwon78/StructuredStreaming/blob/master/src/main/scala/ThumblingWindow.scala)
+## 2. [Streaming Aggregations](https://github.com/okwon78/StructuredStreaming/blob/master/src/main/scala/StreamingAggregations.scala)
 
-## 3. [Streaming Triggers](https://github.com/okwon78/StructuredStreaming/blob/master/src/main/scala/StreamingTriggers.scala)
+## 3. [Thumbling Window](https://github.com/okwon78/StructuredStreaming/blob/master/src/main/scala/ThumblingWindow.scala)
 
-## 4. [Streaming Aggregations](https://github.com/okwon78/StructuredStreaming/blob/master/src/main/scala/StreamingAggregations.scala)
+## 4. [Sliding Window](https://github.com/okwon78/StructuredStreaming/blob/master/src/main/scala/SlidingWindow.scala)
 
-## 5. [Sliding Window](https://github.com/okwon78/StructuredStreaming/blob/master/src/main/scala/SlidingWindow.scala)
+## 5. [Streaming Triggers](https://github.com/okwon78/StructuredStreaming/blob/master/src/main/scala/StreamingTriggers.scala)
 
 ## 6. [Elasticsearch Sink](https://github.com/okwon78/StructuredStreaming/blob/master/src/main/scala/ElasticsearchSink.scala)
 
