@@ -25,7 +25,7 @@ object SlidingWindow {
     val tumblingWindowAggregations = streamingData
       .withWatermark("timestamp", "10 minutes")
       .groupBy(
-        window(col("timestamp"),"1 hours"),
+        window(col("timestamp"),"1 hours", "10 minutes"),
         col("Country")
       )
       .agg(sum("Count"))
