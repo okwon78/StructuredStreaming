@@ -28,6 +28,7 @@ object ThumblingWindow {
           col("Country")
         )
         .agg(sum("Count"))
+        .orderBy("window")
 
     val sink = tumblingWindowAggregations
         .writeStream

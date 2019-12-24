@@ -22,15 +22,15 @@ object SlidingWindow {
       .option("header", true)
       .csv("./data/source")
 
-    val tumblingWindowAggregations = streamingData
-      .withWatermark("timestamp", "10 minutes")
+    val slidingWindowAggregations = streamingData
       .groupBy(
-        window(col("timestamp"),"1 hours"),
+        window(col("timestamp"),"1 hours", "30 minutes"),
         col("Country")
       )
       .agg(sum("Count"))
+      .orderBy("window")
 
-    val sink = tumblingWindowAggregations
+    val sink = slidingWindowAggregations
       .writeStream
       .format("console")
       .option("truncate", "false")

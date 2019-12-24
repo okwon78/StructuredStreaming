@@ -31,12 +31,13 @@ object StreamingWithWatermark {
         col("Country")
       )
       .agg(sum("Count"))
+      .orderBy("window")
 
     val sink = tumblingWindowAggregations
       .writeStream
       .format("console")
       .option("truncate", "false")
-      .outputMode("update")
+      .outputMode("complete")
       .start()
 
     sink.awaitTermination()
