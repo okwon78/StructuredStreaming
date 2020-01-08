@@ -5,38 +5,51 @@ import org.apache.log4j._
 
 object KafkaSource {
 
-  val servers = Array("b-1.apne2apdataabcbdp.3brgpi.c4.kafka.ap-northeast-2.amazonaws.com:9094",
-                      "b-2.apne2apdataabcbdp.3brgpi.c4.kafka.ap-northeast-2.amazonaws.com:9094",
-                      "b-3.apne2apdataabcbdp.3brgpi.c4.kafka.ap-northeast-2.amazonaws.com:9094")
+  val servers = Array("b-1.apne2apdataabcbdp.3brgpi.c4.kafka.ap-northeast-2.amazonaws.com:9092",
+                      "b-2.apne2apdataabcbdp.3brgpi.c4.kafka.ap-northeast-2.amazonaws.com:9092",
+                      "b-3.apne2apdataabcbdp.3brgpi.c4.kafka.ap-northeast-2.amazonaws.com:9092")
+
+  val topic: String = "bdp_apne2_prd_rl_on_ari"
+
 
   def main(args: Array[String]): Unit = {
 
-    println("## Structured Streaming with Kafka ##")
-    val topic: String = "bdp_apne2_prd_rl_on_ari"
     val bootstrap_servers: String = servers.mkString(",")
-    println("## Structured Streaming with Kafka ##")
 
-    println("topic: " + topic)
-    println("bootstrap_servers: " + bootstrap_servers)
+    val spark = SparkSession.builder()
+      .appName("Spark Streaming Aggregations")
+      .config("spark.sql.streaming.schemaInference", true)
+      .config("spark.dynamicAllocation.enabled", true)
+      .config("spark.dynamicAllocation.executorIdleTimeout", "360s")
+      .config("spark.dynamicAllocation.minExecutors", "2")
+      .config("spark.default.parallelism", "2")
+      .master("local[2]").getOrCreate()
 
-    val spark = SparkSession.builder().appName("Spark Streaming Aggregations").master("yarn").getOrCreate()
-    spark.sparkContext.setLogLevel("ERROR")
+    spark.sparkContext.setLogLevel("INFO")
 
     val logger: Logger = Logger.getLogger("org.apache.spark")
-    logger.info("bootstrap_servers " + bootstrap_servers)
+    logger.info("#####################################")
+    logger.info("## Structured Streaming with Kafka ##")
+    logger.info("topic: " + topic)
+    logger.info("bootstrap_servers: " + bootstrap_servers)
+    logger.info("## Structured Streaming with Kafka ##")
+    logger.info("#####################################")
 
     val df = spark
       .readStream
       .format("kafka")
       .option("kafka.bootstrap.servers", bootstrap_servers)
       .option("subscribe", topic)
-      .option("startingOffsets", "latest")
+      .option("startingOffsets", "earliest")
+      .option("kafkaConsumer.pollTimeoutMs", 512)
+      .option("fetchOffset.numRetries", 1000)
+      .option("fetchOffset.retryIntervalMs", 100000)
       .option("maxOffsetsPerTrigger", 10)
       .load()
 
-    //val query = df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
+    val query = df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
 
-    df.writeStream
+    query.writeStream
       .format("console")
       //.option("truncate", "false")
       //.queryName("kafka")
